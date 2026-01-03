@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Test - List Layout</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #fafafa;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        header {
+            text-align: center;
+            padding: 3rem 0;
+            border-bottom: 2px solid #e0e0e0;
+            margin-bottom: 3rem;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        #blog-content {
+            min-height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>List Layout Test</h1>
+            <p>Clean, simple blog list</p>
+        </header>
+
+        <div id="blog-content"></div>
+    </div>
+
+    <!-- Local build files -->
+    <link rel="stylesheet" href="../dist/nostr-blog.css">
+    <script
+        src="../dist/nostr-blog.js"
+        data-pubkey="3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d"
+        data-relays='["wss://relay.damus.io", "wss://nos.lol"]'
+        data-content-selector="#blog-content"
+        data-layout="list"
+        data-theme="light"
+        data-show-images="true"
+        data-date-format="long"
+        data-posts-per-page="10">
+    </script>
+</body>
+</html>

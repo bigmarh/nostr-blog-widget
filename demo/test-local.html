@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Test - Nostr Blog Widget</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #f5f5f5;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header {
+            background: white;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            color: #666;
+        }
+        #blog-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-height: 400px;
+        }
+        .test-info {
+            background: #fffbeb;
+            border: 1px solid #fbbf24;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        .test-info h2 {
+            color: #92400e;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .test-info p {
+            color: #78350f;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="test-info">
+            <h2>🧪 Local Testing Mode</h2>
+            <p><strong>Important:</strong> Replace the <code>data-pubkey</code> below with a real Nostr pubkey to see actual posts.</p>
+            <p>Recommended test pubkeys:</p>
+            <ul>
+                <li><strong>Jack Dorsey:</strong> npub1sg6plzptd64u62a878hep2kev88swjh3tw00gjsfl8f237lmu63q0uf63m</li>
+                <li><strong>Fiatjaf:</strong> 3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d</li>
+            </ul>
+        </div>
+
+        <header>
+            <h1>Local Test - Nostr Blog Widget</h1>
+            <p class="subtitle">Testing Grid Layout</p>
+        </header>
+
+        <div id="blog-content"></div>
+    </div>
+
+    <!-- Local build files -->
+    <link rel="stylesheet" href="../dist/nostr-blog.css">
+    <script
+        src="../dist/nostr-blog.js"
+        data-pubkey="3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d"
+        data-relays='["wss://relay.damus.io", "wss://nos.lol", "wss://relay.nostr.band"]'
+        data-content-selector="#blog-content"
+        data-layout="grid"
+        data-theme="light"
+        data-show-images="true"
+        data-date-format="relative"
+        data-posts-per-page="12">
+    </script>
+</body>
+</html>

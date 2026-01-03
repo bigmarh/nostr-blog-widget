@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nostr Blog Widget - Sidebar Navigation Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #f9fafb;
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            padding: 2rem 1rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .sidebar h2 {
+            color: #111827;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            padding: 0 1rem;
+        }
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+        }
+        header {
+            background: white;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #111827;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            color: #6b7280;
+        }
+        #blog-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <h2>Blog Posts</h2>
+        <div id="blog-nav"></div>
+    </aside>
+
+    <div class="main-content">
+        <header>
+            <h1>My Nostr Blog</h1>
+            <p class="subtitle">Sidebar Navigation • List View</p>
+        </header>
+
+        <div id="blog-content"></div>
+    </div>
+
+    <!-- Nostr Blog Widget -->
+    <link rel="stylesheet" href="../dist/nostr-blog.css">
+    <script
+        src="../dist/nostr-blog.js"
+        data-pubkey="your-npub-or-hex-pubkey-here"
+        data-relays='["wss://relay.damus.io", "wss://nos.lol", "wss://relay.nostr.band"]'
+        data-nav-selector="#blog-nav"
+        data-content-selector="#blog-content"
+        data-layout="list"
+        data-theme="light"
+        data-show-images="true"
+        data-date-format="long"
+        data-posts-per-page="10">
+    </script>
+</body>
+</html>

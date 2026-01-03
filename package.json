@@ -1,0 +1,54 @@
+{
+  "name": "nostr-blog-widget",
+  "version": "0.1.0",
+  "description": "A drop-in JavaScript widget that transforms any webpage into a Nostr-powered blog",
+  "main": "dist/nostr-blog.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "dev": "webpack --mode development --watch",
+    "build": "webpack --mode production",
+    "serve": "npx http-server . -p 3000 -o /demo/test-debug.html",
+    "dev:serve": "npm run dev & npm run serve",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "keywords": [
+    "nostr",
+    "blog",
+    "widget",
+    "solidjs",
+    "decentralized"
+  ],
+  "author": "Lamar Wilson",
+  "license": "MIT",
+  "dependencies": {
+    "marked": "^17.0.1",
+    "nostr-tools": "^2.10.2",
+    "solid-js": "^1.9.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "autoprefixer": "^10.4.16",
+    "babel-preset-solid": "^1.9.3",
+    "css-loader": "^6.8.1",
+    "mini-css-extract-plugin": "^2.7.6",
+    "postcss": "^8.4.32",
+    "postcss-loader": "^7.3.3",
+    "style-loader": "^3.3.3",
+    "tailwindcss": "^3.3.6",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.3.3",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bigmarh/nostr-blog-widget"
+  },
+  "homepage": "https://lamarwilson.com",
+  "bugs": {
+    "url": "https://github.com/bigmarh/nostr-blog-widget/issues"
+  }
+}

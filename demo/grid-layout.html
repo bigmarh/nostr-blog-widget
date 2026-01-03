@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nostr Blog Widget - Grid Layout Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        header {
+            background: white;
+            padding: 3rem 2rem;
+            margin-bottom: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        #blog-content {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📝 Nostr Blog</h1>
+            <p class="subtitle">Grid Layout • Decentralized Publishing</p>
+        </header>
+
+        <div id="blog-content"></div>
+    </div>
+
+    <!-- Nostr Blog Widget -->
+    <link rel="stylesheet" href="../dist/nostr-blog.css">
+    <script
+        src="../dist/nostr-blog.js"
+        data-pubkey="your-npub-or-hex-pubkey-here"
+        data-relays='["wss://relay.damus.io", "wss://nos.lol", "wss://relay.nostr.band"]'
+        data-content-selector="#blog-content"
+        data-layout="grid"
+        data-theme="light"
+        data-show-images="true"
+        data-date-format="short"
+        data-posts-per-page="12">
+    </script>
+</body>
+</html>
