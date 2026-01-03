@@ -93,6 +93,19 @@ export class NostrService {
       allEvents = await this.pool.querySync(this.relays, filter);
     }
 
+    // Client-side filter for date range (in case relays don't honor it)
+    if (dateRange) {
+      allEvents = allEvents.filter(event => {
+        if (dateRange.since && event.created_at < dateRange.since) {
+          return false;
+        }
+        if (dateRange.until && event.created_at > dateRange.until) {
+          return false;
+        }
+        return true;
+      });
+    }
+
     // Fetch author profiles for all unique authors
     await this.fetchAuthorProfiles(normalizedPubkeys);
 
