@@ -1,5 +1,7 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const webpack = require('webpack');
+const package = require('./package.json');
 
 module.exports = (env, argv) => {
   const isProduction = argv.mode === 'production';
@@ -57,9 +59,25 @@ module.exports = (env, argv) => {
       new MiniCssExtractPlugin({
         filename: 'nostr-blog.css',
       }),
+      new webpack.BannerPlugin({
+        banner: `Nostr Blog Widget v${package.version} | https://github.com/bigmarh/nostr-blog-widget`,
+      }),
     ],
     optimization: {
       minimize: isProduction,
+      minimizer: isProduction ? [
+        (compiler) => {
+          const TerserPlugin = require('terser-webpack-plugin');
+          new TerserPlugin({
+            extractComments: false,
+            terserOptions: {
+              format: {
+                comments: /Nostr Blog Widget/,
+              },
+            },
+          }).apply(compiler);
+        },
+      ] : [],
     },
     devtool: isProduction ? 'source-map' : 'eval-source-map',
   };
