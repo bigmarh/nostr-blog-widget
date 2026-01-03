@@ -647,7 +647,7 @@
             // Create new script with updated config (cache bust to force reload)
             const newScript = document.createElement('script');
             newScript.id = 'widget-script';
-            newScript.src = '../dist/nostr-blog.js?v=' + Date.now();
+            newScript.src = 'https://cdn.jsdelivr.net/npm/nostr-blog-widget@0.3.1/dist/nostr-blog.js?v=' + Date.now();
             newScript.setAttribute('data-pubkey', '["3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d", "npub1j8y6tcdfw3q3f3h794s6un0gyc5742s0k5h5s2yqj0r70cpklqeqjavrvg", "npub1k7cnst4fh4ajgg8w6ndcmqen4fnyc7ahhm3zpp255vdxqarrtekq5rrg96"]');
             newScript.setAttribute('data-relays', '["wss://relay.damus.io", "wss://nos.lol", "wss://relay.nostr.band"]');
             newScript.setAttribute('data-content-selector', '#demo-widget');
