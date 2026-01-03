@@ -178,7 +178,7 @@ export const App: Component<AppProps> = (props) => {
   };
 
   return (
-    <div class="nbw-font-sans nbw-antialiased">
+    <div class="nbw-font-sans nbw-antialiased" data-theme={currentConfig().theme}>
       <Show when={error()}>
         <div class="nbw-bg-red-100 nbw-border nbw-border-red-400 nbw-text-red-700 nbw-px-4 nbw-py-3 nbw-rounded nbw-mb-4">
           {error()}

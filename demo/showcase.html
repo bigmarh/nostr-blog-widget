@@ -551,6 +551,15 @@
                     </div>
 
                     <div class="control-group">
+                        <label>Theme</label>
+                        <select id="theme-select">
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                            <option value="auto">Auto</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
                         <label>Date Format</label>
                         <select id="date-select">
                             <option value="relative">Relative</option>
@@ -621,6 +630,7 @@
             const showControls = document.getElementById('controls-toggle').checked;
             const showImages = document.getElementById('images-toggle').checked;
             const showSummary = document.getElementById('summary-toggle').checked;
+            const theme = document.getElementById('theme-select').value;
             const dateFormat = document.getElementById('date-select').value;
             const contentType = document.getElementById('content-select').value;
 
@@ -642,7 +652,7 @@
             newScript.setAttribute('data-relays', '["wss://relay.damus.io", "wss://nos.lol", "wss://relay.nostr.band"]');
             newScript.setAttribute('data-content-selector', '#demo-widget');
             newScript.setAttribute('data-layout', layout);
-            newScript.setAttribute('data-theme', 'light');
+            newScript.setAttribute('data-theme', theme);
             newScript.setAttribute('data-show-controls', showControls.toString());
             newScript.setAttribute('data-posts-per-page', posts);
             newScript.setAttribute('data-show-images', showImages.toString());
@@ -660,6 +670,7 @@
             document.getElementById('controls-toggle').addEventListener('change', updateWidget);
             document.getElementById('images-toggle').addEventListener('change', updateWidget);
             document.getElementById('summary-toggle').addEventListener('change', updateWidget);
+            document.getElementById('theme-select').addEventListener('change', updateWidget);
             document.getElementById('date-select').addEventListener('change', updateWidget);
             document.getElementById('content-select').addEventListener('change', updateWidget);
         });
