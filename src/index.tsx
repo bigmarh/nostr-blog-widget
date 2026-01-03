@@ -42,7 +42,7 @@ function init() {
     relays: JSON.parse(scriptTag.dataset.relays || '["wss://relay.damus.io", "wss://nos.lol"]'),
     navSelector: scriptTag.dataset.navSelector || '',
     contentSelector: scriptTag.dataset.contentSelector || '',
-    layout: (scriptTag.dataset.layout as 'list' | 'grid') || 'list',
+    layout: (scriptTag.dataset.layout as 'list' | 'grid' | 'compact') || 'list',
     theme: (scriptTag.dataset.theme as 'light' | 'dark' | 'auto') || 'light',
     postsPerPage: parseInt(scriptTag.dataset.postsPerPage || '10', 10),
     showImages: scriptTag.dataset.showImages !== 'false',
@@ -51,6 +51,7 @@ function init() {
     dateRange,
     showControls: scriptTag.dataset.showControls === 'true',
     pagination: (scriptTag.dataset.pagination as 'infinite-scroll' | 'load-more' | 'none') || 'load-more',
+    showSummary: scriptTag.dataset.showSummary !== 'false',
   };
 
   // Validate required config

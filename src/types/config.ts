@@ -18,6 +18,7 @@ export interface NostrBlogConfig {
   showControls: boolean; // Show/hide control panel
   pagination: 'infinite-scroll' | 'load-more' | 'none'; // Pagination type
   selectedAuthor?: string; // Filter by specific author (when multiple pubkeys)
+  showSummary: boolean; // Show/hide summaries in grid and list views
 }
 
 export interface BlogPost extends Event {

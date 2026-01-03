@@ -104,7 +104,7 @@ export const PostList: Component<PostListProps> = (props) => {
                 />
               ) : (
                 <>
-                  {post.summary && (
+                  {props.config.showSummary && post.summary && (
                     <p class="nbw-text-gray-700 nbw-mb-4">
                       {post.summary}
                     </p>

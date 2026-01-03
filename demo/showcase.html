@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nostr Blog Widget - Decentralized Blogging Made Simple</title>
+    <link rel="stylesheet" href="../dist/nostr-blog.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: #ffffff;
+        }
+
+        /* Navigation */
+        nav {
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #666;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: #1a1a1a;
+        }
+
+        /* Hero Section */
+        .hero {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 120px 40px 80px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            color: #1a1a1a;
+        }
+
+        .hero .subtitle {
+            font-size: 1.5rem;
+            color: #666;
+            margin-bottom: 48px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            font-weight: 400;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 60px;
+        }
+
+        .btn {
+            padding: 14px 32px;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: inline-block;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background: #1a1a1a;
+            color: white;
+            border-color: #1a1a1a;
+        }
+
+        .btn-primary:hover {
+            background: #000;
+            border-color: #000;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #1a1a1a;
+            border: 1px solid #e5e5e5;
+        }
+
+        .btn-secondary:hover {
+            border-color: #1a1a1a;
+        }
+
+        /* Features Section */
+        .features {
+            background: #fafafa;
+            padding: 100px 40px;
+        }
+
+        .features-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .section-header p {
+            font-size: 1.25rem;
+            color: #666;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 40px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            border: 1px solid #e5e5e5;
+            transition: all 0.2s;
+        }
+
+        .feature-card:hover {
+            border-color: #1a1a1a;
+            transform: translateY(-2px);
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 12px;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.7;
+        }
+
+        /* Code Section */
+        .code-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px 40px;
+        }
+
+        .code-block-wrapper {
+            background: #1a1a1a;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .code-header {
+            background: #2a2a2a;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #3a3a3a;
+        }
+
+        .code-title {
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        .copy-btn {
+            background: transparent;
+            color: #999;
+            border: 1px solid #444;
+            padding: 6px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #3a3a3a;
+            color: white;
+            border-color: #666;
+        }
+
+        .code-block {
+            padding: 24px;
+            overflow-x: auto;
+        }
+
+        .code-block pre {
+            margin: 0;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e5e5e5;
+        }
+
+        /* Demo Section */
+        .demo-section {
+            background: #fafafa;
+            padding: 100px 40px;
+        }
+
+        .demo-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        #demo-widget {
+            min-height: 400px;
+            margin-top: 40px;
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid #e5e5e5;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #666;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .footer-links a:hover {
+            color: #1a1a1a;
+        }
+
+        footer p {
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav {
+                padding: 16px 20px;
+            }
+
+            .nav-links {
+                gap: 20px;
+            }
+
+            .hero {
+                padding: 80px 20px 60px;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero .subtitle {
+                font-size: 1.2rem;
+            }
+
+            .features {
+                padding: 60px 20px;
+            }
+
+            .code-section {
+                padding: 60px 20px;
+            }
+
+            .demo-section {
+                padding: 60px 20px;
+            }
+
+            .section-header h2 {
+                font-size: 2rem;
+            }
+
+            footer {
+                padding: 40px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">Nostr Blog Widget</div>
+        <ul class="nav-links">
+            <li><a href="https://github.com/bigmarh/nostr-blog-widget#readme">Docs</a></li>
+            <li><a href="https://www.npmjs.com/package/nostr-blog-widget">npm</a></li>
+            <li><a href="https://github.com/bigmarh/nostr-blog-widget">GitHub</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Decentralized Blogging<br>Made Simple</h1>
+        <p class="subtitle">A lightweight JavaScript widget that transforms any webpage into a Nostr-powered blog. No backend. No complexity.</p>
+
+        <div class="cta-buttons">
+            <a href="#demo" class="btn btn-primary">See Live Demo</a>
+            <a href="https://github.com/bigmarh/nostr-blog-widget" class="btn btn-secondary">View on GitHub</a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="features-container">
+            <div class="section-header">
+                <h2>Everything you need</h2>
+                <p>Built for developers who value simplicity</p>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Drop-in Ready</h3>
+                    <p>Add one script tag and you're done. No build steps, no frameworks required, no complicated setup.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Multi-Author Support</h3>
+                    <p>Aggregate posts from multiple Nostr authors with automatic filtering and profile fetching.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Flexible Layouts</h3>
+                    <p>Choose from Grid, List, or Compact views. All fully responsive and customizable.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Rich Media</h3>
+                    <p>Automatic embedding of images, videos, and referenced Nostr posts with preview cards.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Dual Content Types</h3>
+                    <p>Support for both long-form articles (NIP-23) and short notes with intelligent rendering.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Full Control</h3>
+                    <p>Built-in controls for filtering by author, content type, date ranges, and more.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Section -->
+    <section class="code-section">
+        <div class="section-header">
+            <h2>Get started in 30 seconds</h2>
+            <p>Copy, paste, and you're live</p>
+        </div>
+
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-title">index.html</span>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <div class="code-block">
+                <pre>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;link rel="stylesheet"
+        href="https://unpkg.com/nostr-blog-widget@latest/dist/nostr-blog.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div
+    id="nostr-blog"
+    data-pubkey='["your-npub-or-hex-pubkey"]'
+    data-relays='["wss://relay.damus.io", "wss://nos.lol"]'
+  &gt;&lt;/div&gt;
+
+  &lt;script src="https://unpkg.com/nostr-blog-widget@latest/dist/nostr-blog.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section class="demo-section" id="demo">
+        <div class="demo-container">
+            <div class="section-header">
+                <h2>Live Demo</h2>
+                <p>Posts from prominent Nostr developers</p>
+            </div>
+
+            <div id="demo-widget"></div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="https://github.com/bigmarh/nostr-blog-widget">GitHub</a>
+                <a href="https://www.npmjs.com/package/nostr-blog-widget">npm</a>
+                <a href="https://github.com/bigmarh/nostr-blog-widget#readme">Documentation</a>
+                <a href="https://github.com/bigmarh/nostr-blog-widget/issues">Issues</a>
+            </div>
+            <p>Built by <a href="https://lamarwilson.com" style="color: #1a1a1a; text-decoration: none;">Lamar Wilson</a> • MIT License</p>
+        </div>
+    </footer>
+
+    <script
+        src="../dist/nostr-blog.js"
+        data-pubkey='["3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d", "npub1j8y6tcdfw3q3f3h794s6un0gyc5742s0k5h5s2yqj0r70cpklqeqjavrvg", "npub1k7cnst4fh4ajgg8w6ndcmqen4fnyc7ahhm3zpp255vdxqarrtekq5rrg96"]'
+        data-relays='["wss://relay.damus.io", "wss://nos.lol", "wss://relay.nostr.band"]'
+        data-content-selector="#demo-widget"
+        data-layout="grid"
+        data-theme="light"
+        data-show-controls="true"
+        data-posts-per-page="9"
+    ></script>
+    <script>
+        function copyCode(btn) {
+            const codeBlock = btn.closest('.code-block-wrapper').querySelector('pre');
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                btn.textContent = 'Copied!';
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
