@@ -95,15 +95,29 @@ export class NostrService {
 
     // Client-side filter for date range (in case relays don't honor it)
     if (dateRange) {
+      console.log('Filtering events by date range:', dateRange);
+      console.log('Events before filter:', allEvents.length);
+
       allEvents = allEvents.filter(event => {
-        if (dateRange.since && event.created_at < dateRange.since) {
+        // Check for published_at tag first, fallback to created_at
+        const publishedAtTag = event.tags.find(([key]) => key === 'published_at');
+        const eventDate = publishedAtTag ? parseInt(publishedAtTag[1], 10) : event.created_at;
+
+        console.log(`Event date: ${eventDate} (${new Date(eventDate * 1000).toISOString()}) [${publishedAtTag ? 'published_at' : 'created_at'}]`);
+
+        if (dateRange.since && eventDate < dateRange.since) {
+          console.log(`  ✗ Filtered out (before ${new Date(dateRange.since * 1000).toISOString()})`);
           return false;
         }
-        if (dateRange.until && event.created_at > dateRange.until) {
+        if (dateRange.until && eventDate > dateRange.until) {
+          console.log(`  ✗ Filtered out (after ${new Date(dateRange.until * 1000).toISOString()})`);
           return false;
         }
+        console.log(`  ✓ Kept`);
         return true;
       });
+
+      console.log('Events after filter:', allEvents.length);
     }
 
     // Fetch author profiles for all unique authors
@@ -264,6 +278,8 @@ export class NostrService {
   }
 
   private parsePosts(events: Event[]): BlogPost[] {
+    console.log(`[parsePosts] Processing ${events.length} events`);
+
     // For kind 30023 (replaceable events), deduplicate by d tag and keep only latest
     const deduplicatedEvents: Event[] = [];
     const kind30023Map = new Map<string, Event>(); // key: "pubkey:dtag"
@@ -271,13 +287,19 @@ export class NostrService {
     for (const event of events) {
       if (event.kind === 30023) {
         const dTag = event.tags.find(([key]) => key === 'd')?.[1];
+        const publishedAt = event.tags.find(([key]) => key === 'published_at')?.[1];
+        console.log(`Event kind 30023: d=${dTag}, created_at=${event.created_at}, published_at=${publishedAt}`);
+
         if (dTag) {
           const key = `${event.pubkey}:${dTag}`;
           const existing = kind30023Map.get(key);
 
           // Keep the newest version (highest created_at)
           if (!existing || event.created_at > existing.created_at) {
+            console.log(`  → ${existing ? 'Replacing' : 'Adding'} event with key: ${key}`);
             kind30023Map.set(key, event);
+          } else {
+            console.log(`  → Skipping older version with key: ${key}`);
           }
         }
       } else {
@@ -287,6 +309,7 @@ export class NostrService {
     }
 
     // Add the deduplicated kind 30023 events
+    console.log(`[parsePosts] Deduplicated ${kind30023Map.size} kind 30023 events from ${events.filter(e => e.kind === 30023).length} total`);
     deduplicatedEvents.push(...kind30023Map.values());
 
     return deduplicatedEvents

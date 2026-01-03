@@ -1,5 +1,6 @@
 import { Component, For } from 'solid-js';
 import { BlogPost, NostrBlogConfig } from '../types/config';
+import { formatDate } from '../services/date';
 import { ContentRenderer } from './ContentRenderer';
 
 interface PostListProps {
@@ -10,33 +11,6 @@ interface PostListProps {
 }
 
 export const PostList: Component<PostListProps> = (props) => {
-  const formatDate = (timestamp: number) => {
-    const date = new Date(timestamp * 1000);
-
-    switch (props.config.dateFormat) {
-      case 'short':
-        return date.toLocaleDateString();
-      case 'long':
-        return date.toLocaleDateString(undefined, {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        });
-      case 'relative':
-        const now = Date.now();
-        const diff = now - date.getTime();
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        if (days === 0) return 'Today';
-        if (days === 1) return 'Yesterday';
-        if (days < 7) return `${days} days ago`;
-        if (days < 30) return `${Math.floor(days / 7)} weeks ago`;
-        if (days < 365) return `${Math.floor(days / 30)} months ago`;
-        return `${Math.floor(days / 365)} years ago`;
-      default:
-        return date.toLocaleDateString();
-    }
-  };
-
   return (
     <div
       class="nbw-grid nbw-gap-6"
@@ -49,12 +23,23 @@ export const PostList: Component<PostListProps> = (props) => {
         {(post) => props.config.layout === 'compact' ? (
           <div class="nbw-py-2 nbw-border-b nbw-border-gray-200">
             <div class="nbw-text-gray-500 nbw-text-xs nbw-mb-1">
-              {formatDate(post.published_at || post.created_at)}
+              {(() => {
+                console.log(`[PostList] Rendering date for "${post.title}": published_at=${post.published_at}, created_at=${post.created_at}, using=${post.published_at || post.created_at}`);
+                return formatDate(post.published_at || post.created_at, props.config.dateFormat);
+              })()}
             </div>
             <a
               href={`#/post/${post.naddr || post.id}`}
               onClick={(e) => {
                 e.preventDefault();
+                console.log(`[PostList] Clicked post:`, {
+                  title: post.title,
+                  naddr: post.naddr,
+                  id: post.id,
+                  published_at: post.published_at,
+                  created_at: post.created_at,
+                  displayDate: post.published_at || post.created_at
+                });
                 props.onNavigate(post.naddr || post.id);
               }}
               class="nbw-text-blue-600 hover:nbw-underline nbw-font-medium nbw-no-underline hover:nbw-text-blue-800"
@@ -91,7 +76,7 @@ export const PostList: Component<PostListProps> = (props) => {
                     {post.authorName}
                   </p>
                   <p class="nbw-text-gray-600 nbw-text-xs">
-                    {formatDate(post.published_at || post.created_at)}
+                    {formatDate(post.published_at || post.created_at, props.config.dateFormat)}
                   </p>
                 </div>
               </div>

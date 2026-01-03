@@ -1,5 +1,6 @@
 import { Component, Show, createSignal, onMount } from 'solid-js';
 import { BlogPost } from '../types/config';
+import { formatDate } from '../services/date';
 
 interface EmbeddedPostProps {
   eventId: string; // naddr, nevent, or note
@@ -24,15 +25,6 @@ export const EmbeddedPost: Component<EmbeddedPostProps> = (props) => {
       setLoading(false);
     }
   });
-
-  const formatDate = (timestamp: number) => {
-    const date = new Date(timestamp * 1000);
-    return date.toLocaleDateString(undefined, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
 
   return (
     <div class="nbw-embedded-post nbw-my-4 nbw-border nbw-border-gray-300 nbw-rounded-lg nbw-overflow-hidden nbw-bg-gray-50 hover:nbw-bg-gray-100 nbw-transition-colors">
@@ -85,7 +77,7 @@ export const EmbeddedPost: Component<EmbeddedPostProps> = (props) => {
               </span>
               <span>•</span>
               <span>
-                {formatDate(post()!.published_at || post()!.created_at)}
+                {formatDate(post()!.published_at || post()!.created_at, 'short')}
               </span>
             </div>
           </div>

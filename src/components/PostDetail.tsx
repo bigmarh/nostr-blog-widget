@@ -1,5 +1,6 @@
 import { Component, Show } from 'solid-js';
 import { BlogPost, NostrBlogConfig } from '../types/config';
+import { formatDate } from '../services/date';
 import { ContentRenderer } from './ContentRenderer';
 
 interface PostDetailProps {
@@ -10,16 +11,14 @@ interface PostDetailProps {
 }
 
 export const PostDetail: Component<PostDetailProps> = (props) => {
-  const formatDate = (timestamp: number) => {
-    const date = new Date(timestamp * 1000);
-    return date.toLocaleDateString(undefined, {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+  console.log(`[PostDetail] Rendering post:`, {
+    title: props.post.title,
+    naddr: props.post.naddr,
+    id: props.post.id,
+    published_at: props.post.published_at,
+    created_at: props.post.created_at,
+    displayDate: props.post.published_at || props.post.created_at
+  });
 
   return (
     <article class="nbw-bg-white nbw-rounded-lg nbw-shadow-lg nbw-overflow-hidden">
@@ -56,7 +55,11 @@ export const PostDetail: Component<PostDetailProps> = (props) => {
               {props.post.authorName}
             </p>
             <p class="nbw-text-gray-600 nbw-text-sm">
-              {formatDate(props.post.published_at || props.post.created_at)}
+              {formatDate(
+                props.post.published_at || props.post.created_at,
+                'long',
+                { includeTime: false }
+              )}
             </p>
           </div>
         </div>

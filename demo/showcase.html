@@ -235,6 +235,36 @@
             color: #e5e5e5;
         }
 
+        /* Docs table */
+        .doc-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            background: #fff;
+            color: #111827;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 0.95rem;
+        }
+
+        .doc-table thead {
+            background: #f9fafb;
+        }
+
+        .doc-table th,
+        .doc-table td {
+            padding: 10px 12px;
+            border: 1px solid #e5e7eb;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .doc-table th {
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
         /* Demo Section */
         .demo-section {
             background: #fafafa;
@@ -474,38 +504,132 @@
         </div>
     </section>
 
-    <!-- Code Section -->
-    <section class="code-section">
+    <!-- Docs Section -->
+    <section class="code-section" id="docs">
         <div class="section-header">
-            <h2>Get started in 30 seconds</h2>
-            <p>Copy, paste, and you're live</p>
+            <h2>How to use</h2>
+            <p>Copy the snippet and configure with data attributes.</p>
         </div>
 
-        <div class="code-block-wrapper">
+        <div class="code-block-wrapper" style="margin-bottom: 32px;">
             <div class="code-header">
-                <span class="code-title">index.html</span>
+                <span class="code-title">Quick start</span>
                 <button class="copy-btn" onclick="copyCode(this)">Copy</button>
             </div>
             <div class="code-block">
-                <pre>&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-  &lt;link rel="stylesheet"
-        href="https://unpkg.com/nostr-blog-widget@latest/dist/nostr-blog.css"&gt;
-&lt;/head&gt;
-&lt;body&gt;
-  &lt;div id="nostr-blog"&gt;&lt;/div&gt;
-
-  &lt;script
-    src="https://unpkg.com/nostr-blog-widget@latest/dist/nostr-blog.js"
-    data-pubkey='["your-npub-or-hex-pubkey"]'
-    data-relays='["wss://relay.damus.io", "wss://nos.lol"]'
-    data-content-selector="#nostr-blog"
-  &gt;&lt;/script&gt;
-&lt;/body&gt;
-&lt;/html&gt;</pre>
+                <pre>&lt;link rel="stylesheet" href="https://unpkg.com/nostr-blog-widget@latest/dist/nostr-blog.css"&gt;
+&lt;div id="nostr-blog"&gt;&lt;/div&gt;
+&lt;script
+  src="https://unpkg.com/nostr-blog-widget@latest/dist/nostr-blog.js"
+  data-pubkey='["npub1...", "hexpubkey..."]'
+  data-relays='["wss://relay.damus.io", "wss://nos.lol"]'
+  data-content-selector="#nostr-blog"
+&gt;&lt;/script&gt;</pre>
             </div>
         </div>
+
+        <table class="doc-table">
+            <thead>
+                <tr>
+                    <th>Attribute</th>
+                    <th>Type</th>
+                    <th>Default</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>data-pubkey</code></td>
+                    <td>string or array</td>
+                    <td><em>required</em></td>
+                    <td>Nostr pubkey(s) in hex or npub format</td>
+                </tr>
+                <tr>
+                    <td><code>data-relays</code></td>
+                    <td>array</td>
+                    <td><em>required</em></td>
+                    <td>Array of Nostr relay URLs</td>
+                </tr>
+                <tr>
+                    <td><code>data-content-selector</code></td>
+                    <td>string</td>
+                    <td><code>#nostr-blog</code></td>
+                    <td>CSS selector where the widget renders</td>
+                </tr>
+                <tr>
+                    <td><code>data-layout</code></td>
+                    <td><code>grid</code> | <code>list</code> | <code>compact</code></td>
+                    <td><code>grid</code></td>
+                    <td>Display layout</td>
+                </tr>
+                <tr>
+                    <td><code>data-theme</code></td>
+                    <td><code>light</code> | <code>dark</code> | <code>auto</code></td>
+                    <td><code>light</code></td>
+                    <td>Color theme</td>
+                </tr>
+                <tr>
+                    <td><code>data-posts-per-page</code></td>
+                    <td>number</td>
+                    <td><code>10</code></td>
+                    <td>Number of posts to load</td>
+                </tr>
+                <tr>
+                    <td><code>data-show-images</code></td>
+                    <td>boolean</td>
+                    <td><code>true</code></td>
+                    <td>Show post images</td>
+                </tr>
+                <tr>
+                    <td><code>data-date-format</code></td>
+                    <td><code>short</code> | <code>long</code> | <code>relative</code></td>
+                    <td><code>relative</code></td>
+                    <td>Date display format</td>
+                </tr>
+                <tr>
+                    <td><code>data-content-type</code></td>
+                    <td><code>all</code> | <code>long-form</code> | <code>short-form</code></td>
+                    <td><code>all</code></td>
+                    <td>Filter by content type</td>
+                </tr>
+                <tr>
+                    <td><code>data-show-controls</code></td>
+                    <td>boolean</td>
+                    <td><code>true</code></td>
+                    <td>Show control panel</td>
+                </tr>
+                <tr>
+                    <td><code>data-pagination</code></td>
+                    <td><code>infinite-scroll</code> | <code>load-more</code> | <code>none</code></td>
+                    <td><code>load-more</code></td>
+                    <td>Pagination style</td>
+                </tr>
+                <tr>
+                    <td><code>data-show-summary</code></td>
+                    <td>boolean</td>
+                    <td><code>true</code></td>
+                    <td>Show summaries for long-form posts</td>
+                </tr>
+                <tr>
+                    <td><code>data-date-since</code></td>
+                    <td>unix timestamp</td>
+                    <td>-</td>
+                    <td>Only show posts after this date</td>
+                </tr>
+                <tr>
+                    <td><code>data-date-until</code></td>
+                    <td>unix timestamp</td>
+                    <td>-</td>
+                    <td>Only show posts before this date</td>
+                </tr>
+                <tr>
+                    <td><code>data-author</code></td>
+                    <td>string</td>
+                    <td>-</td>
+                    <td>Single pubkey to spotlight</td>
+                </tr>
+            </tbody>
+        </table>
     </section>
 
     <!-- Demo Section -->
@@ -602,12 +726,12 @@
         data-pubkey='["3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d", "npub1j8y6tcdfw3q3f3h794s6un0gyc5742s0k5h5s2yqj0r70cpklqeqjavrvg", "npub1k7cnst4fh4ajgg8w6ndcmqen4fnyc7ahhm3zpp255vdxqarrtekq5rrg96"]'
         data-relays='["wss://relay.damus.io", "wss://nos.lol", "wss://relay.nostr.band"]'
         data-content-selector="#demo-widget"
-        data-layout="grid"
+        data-layout="list"
         data-theme="light"
         data-show-controls="true"
         data-posts-per-page="9"
         data-show-images="true"
-        data-show-summary="true"
+        data-show-summary="false"
         data-date-format="relative"
         data-content-type="all"
     ></script>
