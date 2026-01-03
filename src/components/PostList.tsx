@@ -52,10 +52,10 @@ export const PostList: Component<PostListProps> = (props) => {
               {formatDate(post.published_at || post.created_at)}
             </div>
             <a
-              href={`#/post/${post.id}`}
+              href={`#/post/${post.naddr || post.id}`}
               onClick={(e) => {
                 e.preventDefault();
-                props.onNavigate(post.id);
+                props.onNavigate(post.naddr || post.id);
               }}
               class="nbw-text-blue-600 hover:nbw-underline nbw-font-medium nbw-no-underline hover:nbw-text-blue-800"
             >
@@ -64,8 +64,8 @@ export const PostList: Component<PostListProps> = (props) => {
           </div>
         ) : (
           <article
-            class="nbw-bg-white nbw-rounded-lg nbw-shadow-md nbw-overflow-hidden nbw-transition-transform hover:nbw-scale-105 nbw-cursor-pointer"
-            onClick={() => props.onNavigate(post.id)}
+            class="nbw-bg-white nbw-rounded-lg nbw-shadow-md nbw-overflow-hidden nbw-cursor-pointer"
+            onClick={() => props.onNavigate(post.naddr || post.id)}
           >
             {props.config.showImages && post.image && (
               <img
@@ -75,7 +75,7 @@ export const PostList: Component<PostListProps> = (props) => {
               />
             )}
             <div class="nbw-p-6">
-              <h2 class="nbw-text-2xl nbw-font-bold nbw-mb-2 nbw-text-gray-900">
+              <h2 class="nbw-text-2xl nbw-font-bold nbw-mb-2 nbw-text-gray-900 hover:nbw-underline">
                 {post.title}
               </h2>
               <div class="nbw-flex nbw-items-center nbw-gap-3 nbw-mb-3">
@@ -109,17 +109,19 @@ export const PostList: Component<PostListProps> = (props) => {
                       {post.summary}
                     </p>
                   )}
-                  <a
-                    href={`#/post/${post.id}`}
-                    class="nbw-text-blue-600 hover:nbw-text-blue-800 nbw-font-semibold nbw-no-underline"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      e.preventDefault();
-                      props.onNavigate(post.id);
-                    }}
-                  >
-                    Read more →
-                  </a>
+                  <div class="nbw-flex nbw-justify-end">
+                    <a
+                      href={`#/post/${post.naddr || post.id}`}
+                      class="nbw-read-more nbw-text-black nbw-font-medium nbw-no-underline hover:nbw-underline"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        props.onNavigate(post.naddr || post.id);
+                      }}
+                    >
+                      Read more →
+                    </a>
+                  </div>
                 </>
               )}
             </div>

@@ -246,9 +246,80 @@
             margin: 0 auto;
         }
 
+        .demo-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .demo-controls {
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 24px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .demo-controls h3 {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .control-group select,
+        .control-group input[type="number"] {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e5e5e5;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            background: white;
+        }
+
+        .control-group select:focus,
+        .control-group input:focus {
+            outline: none;
+            border-color: #1a1a1a;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+        }
+
         #demo-widget {
             min-height: 400px;
-            margin-top: 40px;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #e5e5e5;
         }
 
         /* Footer */
@@ -318,6 +389,15 @@
 
             .demo-section {
                 padding: 60px 20px;
+            }
+
+            .demo-layout {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .demo-controls {
+                position: static;
             }
 
             .section-header h2 {
@@ -414,13 +494,14 @@
         href="https://unpkg.com/nostr-blog-widget@latest/dist/nostr-blog.css"&gt;
 &lt;/head&gt;
 &lt;body&gt;
-  &lt;div
-    id="nostr-blog"
+  &lt;div id="nostr-blog"&gt;&lt;/div&gt;
+
+  &lt;script
+    src="https://unpkg.com/nostr-blog-widget@latest/dist/nostr-blog.js"
     data-pubkey='["your-npub-or-hex-pubkey"]'
     data-relays='["wss://relay.damus.io", "wss://nos.lol"]'
-  &gt;&lt;/div&gt;
-
-  &lt;script src="https://unpkg.com/nostr-blog-widget@latest/dist/nostr-blog.js"&gt;&lt;/script&gt;
+    data-content-selector="#nostr-blog"
+  &gt;&lt;/script&gt;
 &lt;/body&gt;
 &lt;/html&gt;</pre>
             </div>
@@ -431,11 +512,66 @@
     <section class="demo-section" id="demo">
         <div class="demo-container">
             <div class="section-header">
-                <h2>Live Demo</h2>
-                <p>Posts from prominent Nostr developers</p>
+                <h2>Interactive Demo</h2>
+                <p>Try different configurations and see live updates</p>
             </div>
 
-            <div id="demo-widget"></div>
+            <div class="demo-layout">
+                <!-- Controls Sidebar -->
+                <div class="demo-controls">
+                    <h3>Configuration</h3>
+
+                    <div class="control-group">
+                        <label>Layout</label>
+                        <select id="layout-select">
+                            <option value="grid">Grid</option>
+                            <option value="list">List</option>
+                            <option value="compact">Compact</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Posts Per Page</label>
+                        <input type="number" id="posts-select" value="9" min="3" max="20">
+                    </div>
+
+                    <div class="control-group checkbox-group">
+                        <input type="checkbox" id="controls-toggle" checked>
+                        <label for="controls-toggle">Show Controls</label>
+                    </div>
+
+                    <div class="control-group checkbox-group">
+                        <input type="checkbox" id="images-toggle" checked>
+                        <label for="images-toggle">Show Images</label>
+                    </div>
+
+                    <div class="control-group checkbox-group">
+                        <input type="checkbox" id="summary-toggle" checked>
+                        <label for="summary-toggle">Show Summaries</label>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Date Format</label>
+                        <select id="date-select">
+                            <option value="relative">Relative</option>
+                            <option value="short">Short</option>
+                            <option value="long">Long</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Content Type</label>
+                        <select id="content-select">
+                            <option value="all">All Posts</option>
+                            <option value="long-form">Long-form Only</option>
+                            <option value="short-form">Short Notes Only</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Widget Preview -->
+                <div id="demo-widget"></div>
+            </div>
         </div>
     </section>
 
@@ -452,7 +588,7 @@
         </div>
     </footer>
 
-    <script
+    <script id="widget-script"
         src="../dist/nostr-blog.js"
         data-pubkey='["3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d", "npub1j8y6tcdfw3q3f3h794s6un0gyc5742s0k5h5s2yqj0r70cpklqeqjavrvg", "npub1k7cnst4fh4ajgg8w6ndcmqen4fnyc7ahhm3zpp255vdxqarrtekq5rrg96"]'
         data-relays='["wss://relay.damus.io", "wss://nos.lol", "wss://relay.nostr.band"]'
@@ -461,6 +597,10 @@
         data-theme="light"
         data-show-controls="true"
         data-posts-per-page="9"
+        data-show-images="true"
+        data-show-summary="true"
+        data-date-format="relative"
+        data-content-type="all"
     ></script>
     <script>
         function copyCode(btn) {
@@ -473,6 +613,56 @@
                 }, 2000);
             });
         }
+
+        // Interactive demo controls
+        function updateWidget() {
+            const layout = document.getElementById('layout-select').value;
+            const posts = document.getElementById('posts-select').value;
+            const showControls = document.getElementById('controls-toggle').checked;
+            const showImages = document.getElementById('images-toggle').checked;
+            const showSummary = document.getElementById('summary-toggle').checked;
+            const dateFormat = document.getElementById('date-select').value;
+            const contentType = document.getElementById('content-select').value;
+
+            // Clear the widget container
+            const container = document.getElementById('demo-widget');
+            container.innerHTML = '';
+
+            // Remove old script
+            const oldScript = document.getElementById('widget-script');
+            if (oldScript) {
+                oldScript.remove();
+            }
+
+            // Create new script with updated config (cache bust to force reload)
+            const newScript = document.createElement('script');
+            newScript.id = 'widget-script';
+            newScript.src = '../dist/nostr-blog.js?v=' + Date.now();
+            newScript.setAttribute('data-pubkey', '["3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d", "npub1j8y6tcdfw3q3f3h794s6un0gyc5742s0k5h5s2yqj0r70cpklqeqjavrvg", "npub1k7cnst4fh4ajgg8w6ndcmqen4fnyc7ahhm3zpp255vdxqarrtekq5rrg96"]');
+            newScript.setAttribute('data-relays', '["wss://relay.damus.io", "wss://nos.lol", "wss://relay.nostr.band"]');
+            newScript.setAttribute('data-content-selector', '#demo-widget');
+            newScript.setAttribute('data-layout', layout);
+            newScript.setAttribute('data-theme', 'light');
+            newScript.setAttribute('data-show-controls', showControls.toString());
+            newScript.setAttribute('data-posts-per-page', posts);
+            newScript.setAttribute('data-show-images', showImages.toString());
+            newScript.setAttribute('data-show-summary', showSummary.toString());
+            newScript.setAttribute('data-date-format', dateFormat);
+            newScript.setAttribute('data-content-type', contentType);
+
+            document.body.appendChild(newScript);
+        }
+
+        // Add event listeners to all controls
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('layout-select').addEventListener('change', updateWidget);
+            document.getElementById('posts-select').addEventListener('change', updateWidget);
+            document.getElementById('controls-toggle').addEventListener('change', updateWidget);
+            document.getElementById('images-toggle').addEventListener('change', updateWidget);
+            document.getElementById('summary-toggle').addEventListener('change', updateWidget);
+            document.getElementById('date-select').addEventListener('change', updateWidget);
+            document.getElementById('content-select').addEventListener('change', updateWidget);
+        });
     </script>
 </body>
 </html>

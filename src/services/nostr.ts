@@ -251,7 +251,32 @@ export class NostrService {
   }
 
   private parsePosts(events: Event[]): BlogPost[] {
-    return events
+    // For kind 30023 (replaceable events), deduplicate by d tag and keep only latest
+    const deduplicatedEvents: Event[] = [];
+    const kind30023Map = new Map<string, Event>(); // key: "pubkey:dtag"
+
+    for (const event of events) {
+      if (event.kind === 30023) {
+        const dTag = event.tags.find(([key]) => key === 'd')?.[1];
+        if (dTag) {
+          const key = `${event.pubkey}:${dTag}`;
+          const existing = kind30023Map.get(key);
+
+          // Keep the newest version (highest created_at)
+          if (!existing || event.created_at > existing.created_at) {
+            kind30023Map.set(key, event);
+          }
+        }
+      } else {
+        // Kind 1 and others are not replaceable
+        deduplicatedEvents.push(event);
+      }
+    }
+
+    // Add the deduplicated kind 30023 events
+    deduplicatedEvents.push(...kind30023Map.values());
+
+    return deduplicatedEvents
       .map((event) => this.parsePost(event))
       .sort((a, b) => (b.published_at || b.created_at) - (a.published_at || a.created_at));
   }
@@ -260,6 +285,7 @@ export class NostrService {
     const post: BlogPost = { ...event };
 
     // Parse tags for metadata
+    let dTag: string | undefined;
     event.tags.forEach(([key, value]) => {
       switch (key) {
         case 'title':
@@ -274,8 +300,27 @@ export class NostrService {
         case 'published_at':
           post.published_at = parseInt(value, 10);
           break;
+        case 'd':
+          dTag = value;
+          break;
       }
     });
+
+    // Generate naddr for kind 30023, nevent for kind 1
+    if (event.kind === 30023 && dTag) {
+      post.naddr = nip19.naddrEncode({
+        kind: event.kind,
+        pubkey: event.pubkey,
+        identifier: dTag,
+        relays: this.relays.slice(0, 2), // Include first 2 relays
+      });
+    } else if (event.kind === 1) {
+      post.naddr = nip19.neventEncode({
+        id: event.id,
+        relays: this.relays.slice(0, 2),
+        author: event.pubkey,
+      });
+    }
 
     // For kind 30023, content is the full article
     // For kind 1, content is the note text
