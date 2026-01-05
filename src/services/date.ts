@@ -1,13 +1,8 @@
 export type DateFormat = 'short' | 'long' | 'relative';
 
-function normalizeSeconds(timestamp: number): number {
-  // Accept seconds or milliseconds; convert ms to seconds when it looks too big.
-  return timestamp > 1_000_000_000_0 ? Math.floor(timestamp / 1000) : timestamp;
-}
-
 function formatRelative(timestamp: number): string {
   const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' });
-  const targetSeconds = normalizeSeconds(timestamp);
+  const targetSeconds = timestamp;
   const nowSeconds = Math.floor(Date.now() / 1000);
   const seconds = targetSeconds - nowSeconds; // negative = past
   const abs = Math.abs(seconds);
@@ -28,7 +23,6 @@ function formatRelative(timestamp: number): string {
 
   // Snap very small differences to "now"
   if (Math.abs(seconds) < 5) {
-    console.log('[formatRelative] near-now', { timestamp, seconds, result: 'now' });
     return rtf.format(0, 'second');
   }
 
@@ -63,15 +57,12 @@ function formatRelative(timestamp: number): string {
       // Use standard rounding so ~1.6 days -> 2 days, ~1.4 days -> 1 day
       const value = Math.round(raw);
       const result = rtf.format(value, unit);
-      console.log('[formatRelative] formatted', { timestamp, seconds, unit, raw, value, result });
       return result;
     }
   }
 
   // Fallback (should never hit because last division is Infinity)
-  const fallback = rtf.format(Math.round(seconds / year), 'year');
-  console.log('[formatRelative] fallback', { timestamp, seconds: Math.round(seconds), result: fallback });
-  return fallback;
+  return rtf.format(Math.round(seconds / year), 'year');
 }
 
 export function formatDate(
@@ -81,21 +72,13 @@ export function formatDate(
 ): string {
   if (!timestamp) return '';
 
-  const seconds = normalizeSeconds(timestamp);
-  const date = new Date(seconds * 1000);
+  const date = new Date(timestamp * 1000);
   if (Number.isNaN(date.getTime())) return '';
 
   if (format === 'relative') {
-    console.log('[formatDate] relative', {
-      timestamp,
-      normalizedSeconds: seconds,
-      nowSeconds: Math.floor(Date.now() / 1000),
-      iso: date.toISOString(),
-    });
-    return formatRelative(seconds);
+    return formatRelative(timestamp);
   }
 
-  const timeZone: Intl.DateTimeFormatOptions = { timeZone: 'UTC' };
   const dateOpts: Intl.DateTimeFormatOptions =
     format === 'long'
       ? {
@@ -108,6 +91,6 @@ export function formatDate(
         }
       : {};
 
-  return date.toLocaleDateString(undefined, { ...dateOpts, ...timeZone });
+  return date.toLocaleDateString(undefined, dateOpts);
 }
 
