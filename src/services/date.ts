@@ -79,6 +79,7 @@ export function formatDate(
     return formatRelative(timestamp);
   }
 
+  const timeZone: Intl.DateTimeFormatOptions = { timeZone: 'UTC' };
   const dateOpts: Intl.DateTimeFormatOptions =
     format === 'long'
       ? {
@@ -91,6 +92,6 @@ export function formatDate(
         }
       : {};
 
-  return date.toLocaleDateString(undefined, dateOpts);
+  return date.toLocaleDateString(undefined, { ...dateOpts, ...timeZone });
 }
 
