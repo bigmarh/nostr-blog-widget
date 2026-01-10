@@ -52,6 +52,8 @@ function init() {
     showControls: scriptTag.dataset.showControls === 'true',
     pagination: (scriptTag.dataset.pagination as 'infinite-scroll' | 'load-more' | 'none') || 'load-more',
     showSummary: scriptTag.dataset.showSummary !== 'false',
+    showRelatedPosts: scriptTag.dataset.showRelatedPosts !== 'false',
+    relatedPostsCount: parseInt(scriptTag.dataset.relatedPostsCount || '3', 10),
   };
 
   // Validate required config

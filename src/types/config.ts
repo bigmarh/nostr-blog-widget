@@ -19,6 +19,8 @@ export interface NostrBlogConfig {
   pagination: 'infinite-scroll' | 'load-more' | 'none'; // Pagination type
   selectedAuthor?: string; // Filter by specific author (when multiple pubkeys)
   showSummary: boolean; // Show/hide summaries in grid and list views
+  showRelatedPosts: boolean; // Show/hide "You may also like" section on post detail
+  relatedPostsCount: number; // Number of related posts to show (default: 3)
 }
 
 export interface BlogPost extends Event {

@@ -38,9 +38,10 @@ export const App: Component<AppProps> = (props) => {
       setError(null);
       const config = currentConfig();
 
-      // Fetch more posts than postsPerPage for pagination
+      // Fetch more posts than postsPerPage for pagination and related posts
       // Always fetch from all configured pubkeys, filter client-side
-      const fetchLimit = config.postsPerPage * 3;
+      // Fetch at least 20 posts to have good variety for "You may also like"
+      const fetchLimit = Math.max(config.postsPerPage * 3, 20);
       const fetchedPosts = await nostrService.fetchPosts(
         config.pubkey,
         fetchLimit,
@@ -239,8 +240,10 @@ export const App: Component<AppProps> = (props) => {
             <PostDetail
               post={post()}
               config={currentConfig()}
+              allPosts={allPosts()}
               onBack={router.navigateToList}
               onFetchPost={(eventId) => nostrService.fetchPostById(eventId)}
+              onNavigate={router.navigateToPost}
             />
           )}
         </Show>

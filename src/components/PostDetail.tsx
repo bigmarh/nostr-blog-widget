@@ -2,24 +2,18 @@ import { Component, Show } from 'solid-js';
 import { BlogPost, NostrBlogConfig } from '../types/config';
 import { formatDate } from '../services/date';
 import { ContentRenderer } from './ContentRenderer';
+import { RelatedPosts } from './RelatedPosts';
 
 interface PostDetailProps {
   post: BlogPost;
   config: NostrBlogConfig;
+  allPosts: BlogPost[];
   onBack: () => void;
   onFetchPost: (eventId: string) => Promise<BlogPost | null>;
+  onNavigate: (postId: string) => void;
 }
 
 export const PostDetail: Component<PostDetailProps> = (props) => {
-  console.log(`[PostDetail] Rendering post:`, {
-    title: props.post.title,
-    naddr: props.post.naddr,
-    id: props.post.id,
-    published_at: props.post.published_at,
-    created_at: props.post.created_at,
-    displayDate: props.post.published_at || props.post.created_at
-  });
-
   return (
     <article class="nbw-bg-white nbw-rounded-lg nbw-shadow-lg nbw-overflow-hidden">
       <Show when={props.config.showImages && props.post.image}>
@@ -71,6 +65,15 @@ export const PostDetail: Component<PostDetailProps> = (props) => {
             useMarkdown={props.post.kind === 30023 || props.post.kind === '30023'}
           />
         </div>
+
+        <Show when={props.config.showRelatedPosts}>
+          <RelatedPosts
+            currentPost={props.post}
+            allPosts={props.allPosts}
+            config={props.config}
+            onNavigate={props.onNavigate}
+          />
+        </Show>
       </div>
     </article>
   );
