@@ -14,19 +14,22 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
-
+      
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'  # or '24' - need newer Node for npm 11+
           registry-url: 'https://registry.npmjs.org'
-
+      
+      # Upgrade npm to get trusted publishing support
+      - name: Upgrade npm
+        run: npm install -g npm@latest
+      
       - name: Install dependencies
         run: npm ci
-
+      
       - name: Build
         run: npm run build
-
+      
       - name: Publish to npm with provenance
         run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        # No NODE_AUTH_TOKEN needed - OIDC handles auth automatically
