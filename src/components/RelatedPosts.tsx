@@ -121,10 +121,10 @@ export const RelatedPosts: Component<RelatedPostsProps> = (props) => {
     <Show when={relatedPosts().length > 0}>
       <div class="nbw-related-posts nbw-mt-12 nbw-pt-8 nbw-border-t nbw-border-gray-200">
         <h2 class="nbw-text-2xl nbw-font-bold nbw-mb-6 nbw-text-gray-900">
-          You may also like
+          Related Posts
         </h2>
 
-        <div class="nbw-grid nbw-grid-cols-1 md:nbw-grid-cols-3 nbw-gap-6">
+        <div style={{ display: 'grid', 'grid-template-columns': 'repeat(3, 1fr)', gap: '1.5rem' }}>
           <For each={relatedPosts()}>
             {(post) => (
               <article
