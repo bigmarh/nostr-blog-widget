@@ -1,6 +1,6 @@
 {
   "name": "nostr-blog-widget",
-  "version": "0.3.11",
+  "version": "0.3.12",
   "description": "A drop-in JavaScript widget that transforms any webpage into a Nostr-powered blog",
   "main": "dist/nostr-blog.js",
   "types": "dist/index.d.ts",
