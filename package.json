@@ -1,6 +1,6 @@
 {
   "name": "nostr-blog-widget",
-  "version": "0.3.9",
+  "version": "0.3.10",
   "description": "A drop-in JavaScript widget that transforms any webpage into a Nostr-powered blog",
   "main": "dist/nostr-blog.js",
   "types": "dist/index.d.ts",
@@ -10,7 +10,9 @@
     "serve": "npx http-server . -p 3000 -o /demo/test-debug.html",
     "serve:showcase": "npx http-server . -p 3000 -o /demo/showcase.html",
     "dev:serve": "npm run dev & npm run serve",
-    "test": "echo \"No tests yet\" && exit 0"
+    "test": "echo \"No tests yet\" && exit 0",
+    "prepublishOnly": "npm run build",
+    "release": "npm run build && npm version patch && git push && git push --tags && npm publish"
   },
   "keywords": [
     "nostr",
