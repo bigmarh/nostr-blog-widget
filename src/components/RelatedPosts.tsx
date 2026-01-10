@@ -119,8 +119,8 @@ export const RelatedPosts: Component<RelatedPostsProps> = (props) => {
 
   return (
     <Show when={relatedPosts().length > 0}>
-      <div class="nbw-related-posts nbw-mt-12 nbw-pt-8 nbw-border-t nbw-border-gray-200">
-        <h2 class="nbw-text-2xl nbw-font-bold nbw-mb-6 nbw-text-gray-900">
+      <div style={{ 'margin-top': '3rem', 'padding-top': '2rem', 'border-top': '1px solid #e5e7eb' }}>
+        <h2 style={{ 'font-size': '1.5rem', 'font-weight': '700', 'margin-bottom': '1.5rem', color: '#111827' }}>
           Related Posts
         </h2>
 
@@ -128,32 +128,46 @@ export const RelatedPosts: Component<RelatedPostsProps> = (props) => {
           <For each={relatedPosts()}>
             {(post) => (
               <article
-                class="nbw-related-post nbw-bg-gray-50 nbw-rounded-lg nbw-overflow-hidden nbw-cursor-pointer nbw-transition-all hover:nbw-shadow-md hover:nbw-bg-gray-100"
+                style={{
+                  'background-color': '#f9fafb',
+                  'border-radius': '0.5rem',
+                  overflow: 'hidden',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
                 onClick={() => props.onNavigate(post.naddr || post.id)}
               >
                 <Show when={props.config.showImages && post.image}>
                   <img
                     src={post.image}
                     alt={post.title}
-                    class="nbw-w-full nbw-h-32 nbw-object-cover"
+                    style={{ width: '100%', height: '8rem', 'object-fit': 'cover' }}
                   />
                 </Show>
 
-                <div class="nbw-p-4">
-                  <h3 class="nbw-font-semibold nbw-text-gray-900 nbw-mb-2 nbw-line-clamp-2">
+                <div style={{ padding: '1rem' }}>
+                  <h3 style={{
+                    'font-weight': '600',
+                    color: '#111827',
+                    'margin-bottom': '0.5rem',
+                    overflow: 'hidden',
+                    display: '-webkit-box',
+                    '-webkit-line-clamp': '2',
+                    '-webkit-box-orient': 'vertical'
+                  }}>
                     {post.title || 'Untitled'}
                   </h3>
 
-                  <div class="nbw-flex nbw-items-center nbw-gap-2 nbw-text-sm nbw-text-gray-600">
+                  <div style={{ display: 'flex', 'align-items': 'center', gap: '0.5rem', 'font-size': '0.875rem', color: '#4b5563' }}>
                     <Show when={post.authorAvatar}>
                       <img
                         src={post.authorAvatar}
                         alt={post.authorName}
-                        class="nbw-w-5 nbw-h-5 nbw-rounded-full nbw-object-cover"
+                        style={{ width: '1.25rem', height: '1.25rem', 'border-radius': '9999px', 'object-fit': 'cover' }}
                       />
                     </Show>
                     <span>{post.authorName}</span>
-                    <span class="nbw-text-gray-400">·</span>
+                    <span style={{ color: '#9ca3af' }}>·</span>
                     <span>
                       {formatDate(
                         post.published_at || post.created_at,
