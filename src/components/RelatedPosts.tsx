@@ -124,7 +124,7 @@ export const RelatedPosts: Component<RelatedPostsProps> = (props) => {
           Related Posts
         </h2>
 
-        <div style={{ display: 'grid', 'grid-template-columns': 'repeat(3, 1fr)', gap: '1.5rem' }}>
+        <div class="nbw-related-posts-grid">
           <For each={relatedPosts()}>
             {(post) => (
               <article

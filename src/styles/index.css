@@ -320,3 +320,16 @@
 .nbw-content-renderer > div {
   color: var(--nbw-text-secondary) !important;
 }
+
+/* Related posts grid - responsive */
+.nbw-related-posts-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .nbw-related-posts-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
