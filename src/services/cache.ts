@@ -129,25 +129,43 @@ export class CacheService {
     const now = Math.floor(Date.now() / 1000);
     const maxAge = now - this.config.ttl;
 
+    // Query each pubkey using the index for faster lookups
+    const allPosts: CachedPost[] = [];
+
+    for (const pubkey of pubkeys) {
+      const posts = await this.getPostsByPubkey(pubkey, maxAge, options);
+      allPosts.push(...posts);
+    }
+
+    // Sort by published_at/created_at descending
+    allPosts.sort((a, b) => {
+      const aTime = a.published_at || a.created_at;
+      const bTime = b.published_at || b.created_at;
+      return bTime - aTime;
+    });
+
+    // Apply limit
+    if (options.limit && allPosts.length > options.limit) {
+      return allPosts.slice(0, options.limit);
+    }
+    return allPosts;
+  }
+
+  private getPostsByPubkey(pubkey: string, maxAge: number, options: CacheQueryOptions): Promise<CachedPost[]> {
     return new Promise((resolve, reject) => {
       const tx = this.db!.transaction(POSTS_STORE, 'readonly');
       const store = tx.objectStore(POSTS_STORE);
+      const index = store.index('pubkey');
       const posts: CachedPost[] = [];
 
-      // Use cursor to iterate through all posts
-      const request = store.openCursor();
+      // Use the pubkey index to query only relevant posts
+      const request = index.openCursor(IDBKeyRange.only(pubkey));
 
       request.onerror = () => reject(request.error);
       request.onsuccess = (event) => {
         const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
         if (cursor) {
           const post = cursor.value as CachedPost;
-
-          // Filter by pubkey
-          if (!pubkeys.includes(post.pubkey)) {
-            cursor.continue();
-            return;
-          }
 
           // Filter by TTL
           if (post.cachedAt < maxAge) {
@@ -175,19 +193,7 @@ export class CacheService {
           posts.push(post);
           cursor.continue();
         } else {
-          // Sort by published_at/created_at descending
-          posts.sort((a, b) => {
-            const aTime = a.published_at || a.created_at;
-            const bTime = b.published_at || b.created_at;
-            return bTime - aTime;
-          });
-
-          // Apply limit
-          if (options.limit && posts.length > options.limit) {
-            resolve(posts.slice(0, options.limit));
-          } else {
-            resolve(posts);
-          }
+          resolve(posts);
         }
       };
     });

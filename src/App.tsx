@@ -39,9 +39,12 @@ export const App: Component<AppProps> = (props) => {
 
   // Create cache service if enabled
   let cacheService: CacheService | null = null;
+  let cacheReady = Promise.resolve();
   if (cacheConfig.enabled) {
     cacheService = new CacheService(undefined, cacheConfig);
-    cacheService.init().catch(err => {
+    cacheReady = cacheService.init().then(() => {
+      console.log('[App] Cache initialized');
+    }).catch(err => {
       console.warn('[App] Failed to initialize cache:', err);
     });
   }
@@ -156,7 +159,8 @@ export const App: Component<AppProps> = (props) => {
   createEffect(() => {
     // Track currentConfig reactively
     currentConfig();
-    fetchPosts();
+    // Wait for cache to be ready before fetching
+    cacheReady.then(() => fetchPosts());
   });
 
   // Handle route changes
