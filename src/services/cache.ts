@@ -17,17 +17,39 @@ export class CacheService {
   }
 
   async init(): Promise<boolean> {
-    if (!window.indexedDB) {
+    // Check if IndexedDB is available
+    if (typeof indexedDB === 'undefined' || !window.indexedDB) {
       console.warn('[CacheService] IndexedDB not available, caching disabled');
+      return false;
+    }
+
+    // Detect private browsing mode (Safari/iOS)
+    try {
+      const testDb = indexedDB.open('__idb_test__');
+      await new Promise<void>((resolve, reject) => {
+        testDb.onerror = () => reject(testDb.error);
+        testDb.onsuccess = () => {
+          testDb.result.close();
+          indexedDB.deleteDatabase('__idb_test__');
+          resolve();
+        };
+      });
+    } catch (err) {
+      console.warn('[CacheService] IndexedDB blocked (private browsing?), caching disabled');
       return false;
     }
 
     try {
       this.db = await this.openDB();
+
+      // Verify we can actually write (catches quota issues on mobile)
+      await this.verifyWriteAccess();
+
       // Run cleanup in background
       this.cleanupExpired().catch(err =>
         console.warn('[CacheService] Cleanup failed:', err)
       );
+      console.log('[CacheService] Initialized successfully');
       return true;
     } catch (err) {
       console.error('[CacheService] Failed to initialize:', err);
@@ -41,6 +63,34 @@ export class CacheService {
         return false;
       }
     }
+  }
+
+  private verifyWriteAccess(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        reject(new Error('Database not initialized'));
+        return;
+      }
+
+      try {
+        const tx = this.db.transaction(POSTS_STORE, 'readwrite');
+        const store = tx.objectStore(POSTS_STORE);
+
+        // Try to write and immediately delete a test record
+        const testKey = '__write_test__';
+        const putRequest = store.put({ cacheKey: testKey, _test: true });
+
+        putRequest.onsuccess = () => {
+          store.delete(testKey);
+        };
+
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+        tx.onabort = () => reject(new Error('Transaction aborted - possible quota exceeded'));
+      } catch (err) {
+        reject(err);
+      }
+    });
   }
 
   private openDB(): Promise<IDBDatabase> {
