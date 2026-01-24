@@ -21,6 +21,7 @@ export interface NostrBlogConfig {
   showSummary: boolean; // Show/hide summaries in grid and list views
   showRelatedPosts: boolean; // Show/hide "You may also like" section on post detail
   relatedPostsCount: number; // Number of related posts to show (default: 3)
+  markedBreaks: boolean; // Enable GFM line breaks in markdown (single newline = <br>)
 }
 
 export interface BlogPost extends Event {

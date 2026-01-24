@@ -63,6 +63,7 @@ export const PostDetail: Component<PostDetailProps> = (props) => {
             content={props.post.content || ''}
             onFetchPost={props.onFetchPost}
             useMarkdown={props.post.kind === 30023 || props.post.kind === '30023'}
+            markedBreaks={props.config.markedBreaks}
           />
         </div>
 

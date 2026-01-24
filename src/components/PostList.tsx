@@ -86,6 +86,7 @@ export const PostList: Component<PostListProps> = (props) => {
                   content={post.content || ''}
                   onFetchPost={props.onFetchPost}
                   useMarkdown={false}
+                  markedBreaks={props.config.markedBreaks}
                 />
               ) : (
                 <>

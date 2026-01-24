@@ -7,6 +7,7 @@ interface ContentRendererProps {
   content: string;
   onFetchPost: (eventId: string) => Promise<BlogPost | null>;
   useMarkdown?: boolean; // Default false for kind 1, true for kind 30023
+  markedBreaks?: boolean; // Enable GFM line breaks (single newline = <br>)
 }
 
 interface NostrReference {
@@ -110,7 +111,7 @@ export const ContentRenderer: Component<ContentRendererProps> = (props) => {
 
           // Render content - use markdown only if specified (for kind 30023)
           if (props.useMarkdown) {
-            return <div innerHTML={marked(part)} />;
+            return <div innerHTML={marked(part, { breaks: props.markedBreaks })} />;
           } else {
             // For kind 1, render as HTML directly (already has <img>, <video>, <a> tags)
             // Convert newlines to <br> tags for proper formatting
