@@ -1,14 +1,33 @@
 import { SimplePool, Event, Filter, nip19 } from 'nostr-tools';
 import { BlogPost, AuthorProfile } from '../types/config';
+import { CacheService } from './cache';
+import { CacheConfig, DEFAULT_CACHE_CONFIG, CachedPost } from '../types/cache';
+
+export interface FetchResult {
+  posts: BlogPost[];
+  fromCache: boolean;
+}
 
 export class NostrService {
   private pool: SimplePool;
   private relays: string[];
   private profileCache: Map<string, AuthorProfile> = new Map();
+  private cacheService: CacheService | null = null;
+  private cacheConfig: CacheConfig;
 
-  constructor(relays: string[]) {
+  constructor(relays: string[], cacheService?: CacheService, cacheConfig?: Partial<CacheConfig>) {
     this.pool = new SimplePool();
     this.relays = relays;
+    this.cacheService = cacheService || null;
+    this.cacheConfig = { ...DEFAULT_CACHE_CONFIG, ...cacheConfig };
+  }
+
+  setCacheService(cacheService: CacheService): void {
+    this.cacheService = cacheService;
+  }
+
+  getProfileCache(): Map<string, AuthorProfile> {
+    return this.profileCache;
   }
 
   // Convert npub to hex if needed
@@ -124,6 +143,104 @@ export class NostrService {
     await this.fetchAuthorProfiles(normalizedPubkeys);
 
     return this.parsePosts(allEvents);
+  }
+
+  private getKindsForContentType(contentType: 'all' | 'long-form' | 'short-form'): number[] {
+    switch (contentType) {
+      case 'long-form':
+        return [30023];
+      case 'short-form':
+        return [1];
+      default:
+        return [30023, 1];
+    }
+  }
+
+  async fetchPostsWithCache(
+    pubkey: string | string[],
+    limit: number = 50,
+    contentType: 'all' | 'long-form' | 'short-form' = 'all',
+    dateRange?: { since?: number; until?: number }
+  ): Promise<FetchResult> {
+    const pubkeys = Array.isArray(pubkey) ? pubkey : [pubkey];
+    const normalizedPubkeys = pubkeys.map(pk => this.normalizePublicKey(pk));
+
+    // Try cache first if enabled
+    if (this.cacheService && this.cacheConfig.enabled) {
+      try {
+        const cachedPosts = await this.cacheService.getPosts(normalizedPubkeys, {
+          kinds: this.getKindsForContentType(contentType),
+          limit,
+          since: dateRange?.since,
+          until: dateRange?.until,
+        });
+
+        if (cachedPosts.length > 0) {
+          // Load cached profiles into memory cache
+          const profiles = await this.cacheService.getProfiles(normalizedPubkeys);
+          profiles.forEach((profile, pk) => this.profileCache.set(pk, profile));
+
+          // Enrich posts with author info
+          const enrichedPosts = this.enrichPostsWithProfiles(cachedPosts);
+          return { posts: enrichedPosts, fromCache: true };
+        }
+      } catch (err) {
+        console.warn('[NostrService] Cache read failed, falling back to network:', err);
+      }
+    }
+
+    // Fetch from network
+    const posts = await this.fetchPosts(pubkey, limit, contentType, dateRange);
+
+    // Save to cache
+    if (this.cacheService && this.cacheConfig.enabled && posts.length > 0) {
+      try {
+        await this.cacheService.savePosts(posts);
+        await this.cacheService.saveProfiles(this.profileCache);
+      } catch (err) {
+        console.warn('[NostrService] Cache write failed:', err);
+      }
+    }
+
+    return { posts, fromCache: false };
+  }
+
+  private enrichPostsWithProfiles(posts: CachedPost[]): BlogPost[] {
+    return posts.map(post => {
+      const profile = this.profileCache.get(post.pubkey);
+      if (profile) {
+        return {
+          ...post,
+          authorName: profile.display_name || profile.name || 'Anonymous',
+          authorAvatar: profile.picture,
+          authorNip05: profile.nip05,
+        };
+      }
+      return post;
+    });
+  }
+
+  async refreshInBackground(
+    pubkey: string | string[],
+    limit: number,
+    contentType: 'all' | 'long-form' | 'short-form',
+    dateRange?: { since?: number; until?: number },
+    onUpdate?: (posts: BlogPost[]) => void
+  ): Promise<void> {
+    try {
+      const posts = await this.fetchPosts(pubkey, limit, contentType, dateRange);
+
+      if (this.cacheService && this.cacheConfig.enabled) {
+        await this.cacheService.savePosts(posts);
+        await this.cacheService.saveProfiles(this.profileCache);
+      }
+
+      if (onUpdate) {
+        onUpdate(posts);
+      }
+    } catch (err) {
+      console.error('[NostrService] Background refresh failed:', err);
+    }
   }
 
   async fetchAuthorProfiles(pubkeys: string[]): Promise<void> {

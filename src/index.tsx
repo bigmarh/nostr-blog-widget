@@ -55,6 +55,13 @@ function init() {
     showRelatedPosts: scriptTag.dataset.showRelatedPosts !== 'false',
     relatedPostsCount: parseInt(scriptTag.dataset.relatedPostsCount || '3', 10),
     markedBreaks: scriptTag.dataset.markedBreaks !== 'false',
+    cache: {
+      enabled: scriptTag.dataset.cacheEnabled !== 'false',
+      ttl: scriptTag.dataset.cacheTtl ? parseInt(scriptTag.dataset.cacheTtl, 10) : undefined,
+      profileTtl: scriptTag.dataset.cacheProfileTtl ? parseInt(scriptTag.dataset.cacheProfileTtl, 10) : undefined,
+      maxPosts: scriptTag.dataset.cacheMaxPosts ? parseInt(scriptTag.dataset.cacheMaxPosts, 10) : undefined,
+      backgroundRefresh: scriptTag.dataset.cacheBackgroundRefresh !== 'false',
+    },
   };
 
   // Validate required config

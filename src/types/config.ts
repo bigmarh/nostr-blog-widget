@@ -22,6 +22,13 @@ export interface NostrBlogConfig {
   showRelatedPosts: boolean; // Show/hide "You may also like" section on post detail
   relatedPostsCount: number; // Number of related posts to show (default: 3)
   markedBreaks: boolean; // Enable GFM line breaks in markdown (single newline = <br>)
+  cache?: {
+    enabled?: boolean; // Enable/disable caching (default: true)
+    ttl?: number; // Cache TTL in seconds (default: 3600 = 1 hour)
+    profileTtl?: number; // Profile cache TTL in seconds (default: 86400 = 24 hours)
+    maxPosts?: number; // Max posts to cache per pubkey (default: 100)
+    backgroundRefresh?: boolean; // Refresh in background after showing cache (default: true)
+  };
 }
 
 export interface BlogPost extends Event {

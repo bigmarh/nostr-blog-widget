@@ -1,6 +1,8 @@
 import { Component, createSignal, createEffect, Show, onCleanup } from 'solid-js';
 import { NostrBlogConfig, BlogPost } from './types/config';
 import { NostrService } from './services/nostr';
+import { CacheService } from './services/cache';
+import { DEFAULT_CACHE_CONFIG } from './types/cache';
 import { createRouter } from './services/router';
 import { PostList } from './components/PostList';
 import { PostDetail } from './components/PostDetail';
@@ -19,15 +21,34 @@ export const App: Component<AppProps> = (props) => {
   const [currentPost, setCurrentPost] = createSignal<BlogPost | null>(null);
   const [loading, setLoading] = createSignal(true);
   const [loadingMore, setLoadingMore] = createSignal(false);
+  const [isRefreshing, setIsRefreshing] = createSignal(false); // Background refresh indicator
   const [error, setError] = createSignal<string | null>(null);
 
   // Make config reactive so controls can update it
   const [currentConfig, setCurrentConfig] = createSignal<NostrBlogConfig>(props.config);
 
   const router = createRouter();
-  const nostrService = new NostrService(currentConfig().relays);
 
-  // Fetch posts function
+  // Initialize cache config
+  const cacheConfig = {
+    ...DEFAULT_CACHE_CONFIG,
+    ...props.config.cache,
+    enabled: props.config.cache?.enabled !== false,
+    backgroundRefresh: props.config.cache?.backgroundRefresh !== false,
+  };
+
+  // Create cache service if enabled
+  let cacheService: CacheService | null = null;
+  if (cacheConfig.enabled) {
+    cacheService = new CacheService(undefined, cacheConfig);
+    cacheService.init().catch(err => {
+      console.warn('[App] Failed to initialize cache:', err);
+    });
+  }
+
+  const nostrService = new NostrService(currentConfig().relays, cacheService || undefined, cacheConfig);
+
+  // Fetch posts function with cache support
   const fetchPosts = async (append: boolean = false) => {
     try {
       if (!append) {
@@ -42,7 +63,9 @@ export const App: Component<AppProps> = (props) => {
       // Always fetch from all configured pubkeys, filter client-side
       // Fetch at least 20 posts to have good variety for "You may also like"
       const fetchLimit = Math.max(config.postsPerPage * 3, 20);
-      const fetchedPosts = await nostrService.fetchPosts(
+
+      // Use cache-aware fetch
+      const { posts: fetchedPosts, fromCache } = await nostrService.fetchPostsWithCache(
         config.pubkey,
         fetchLimit,
         config.contentType,
@@ -69,6 +92,29 @@ export const App: Component<AppProps> = (props) => {
 
       setLoading(false);
       setLoadingMore(false);
+
+      // Background refresh if we loaded from cache
+      if (fromCache && cacheConfig.backgroundRefresh) {
+        setIsRefreshing(true);
+        nostrService.refreshInBackground(
+          config.pubkey,
+          fetchLimit,
+          config.contentType,
+          config.dateRange,
+          (freshPosts) => {
+            // Update posts if we got fresh data
+            if (freshPosts.length > 0) {
+              setAllPosts(freshPosts);
+              const freshFiltered = config.selectedAuthor
+                ? freshPosts.filter(post => post.pubkey === config.selectedAuthor)
+                : freshPosts;
+              const newDisplayPosts = freshFiltered.slice(0, displayedCount());
+              setPosts(newDisplayPosts);
+            }
+            setIsRefreshing(false);
+          }
+        );
+      }
     } catch (err) {
       setError('Failed to load posts. Please try again later.');
       setLoading(false);
@@ -142,6 +188,7 @@ export const App: Component<AppProps> = (props) => {
 
   onCleanup(() => {
     nostrService.close();
+    cacheService?.close();
   });
 
   // Control panel handlers
@@ -180,6 +227,17 @@ export const App: Component<AppProps> = (props) => {
 
   return (
     <div class="nbw-font-sans nbw-antialiased" data-theme={currentConfig().theme}>
+      {/* Background refresh indicator */}
+      <Show when={isRefreshing()}>
+        <div class="nbw-fixed nbw-top-4 nbw-right-4 nbw-bg-blue-100 nbw-text-blue-800 nbw-px-3 nbw-py-1 nbw-rounded-full nbw-text-sm nbw-flex nbw-items-center nbw-gap-2 nbw-shadow-md nbw-z-50">
+          <svg class="nbw-animate-spin nbw-h-4 nbw-w-4" fill="none" viewBox="0 0 24 24">
+            <circle class="nbw-opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="nbw-opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Checking for updates...
+        </div>
+      </Show>
+
       <Show when={error()}>
         <div class="nbw-bg-red-100 nbw-border nbw-border-red-400 nbw-text-red-700 nbw-px-4 nbw-py-3 nbw-rounded nbw-mb-4">
           {error()}
