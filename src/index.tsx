@@ -54,7 +54,7 @@ function init() {
     showSummary: scriptTag.dataset.showSummary !== 'false',
     showRelatedPosts: scriptTag.dataset.showRelatedPosts !== 'false',
     relatedPostsCount: parseInt(scriptTag.dataset.relatedPostsCount || '3', 10),
-    markedBreaks: scriptTag.dataset.markedBreaks === 'true',
+    markedBreaks: scriptTag.dataset.markedBreaks !== 'false',
   };
 
   // Validate required config
