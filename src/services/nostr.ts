@@ -282,19 +282,37 @@ export class NostrService {
     }
 
     // Check if it's a note1 (bech32 encoded note ID)
+    let hexId = eventId;
     if (eventId.startsWith('note1')) {
       try {
         const decoded = nip19.decode(eventId);
         if (decoded.type === 'note') {
-          eventId = decoded.data as string; // Convert to hex
+          hexId = decoded.data as string; // Convert to hex
         }
       } catch (err) {
         console.error('Failed to decode note1:', err);
       }
     }
 
+    // Check cache first for fast loading
+    if (this.cacheService && this.cacheConfig.enabled) {
+      try {
+        const cachedPost = await this.cacheService.getPostById(hexId);
+        if (cachedPost) {
+          // Load profile from cache or memory
+          const profiles = await this.cacheService.getProfiles([cachedPost.pubkey]);
+          profiles.forEach((profile, pk) => this.profileCache.set(pk, profile));
+          const enriched = this.enrichPostsWithProfiles([cachedPost]);
+          console.log('[NostrService] Returning post from cache:', hexId);
+          return enriched[0] || null;
+        }
+      } catch (err) {
+        console.warn('[NostrService] Cache lookup failed:', err);
+      }
+    }
+
     const filter: Filter = {
-      ids: [eventId],
+      ids: [hexId],
     };
 
     const events = await this.pool.querySync(this.relays, filter);
@@ -306,7 +324,19 @@ export class NostrService {
     }
 
     const parsed = this.parsePosts(events);
-    return parsed[0] || null;
+    const post = parsed[0] || null;
+
+    // Save to cache for next time
+    if (post && this.cacheService && this.cacheConfig.enabled) {
+      try {
+        await this.cacheService.savePosts([post]);
+        await this.cacheService.saveProfiles(this.profileCache);
+      } catch (err) {
+        console.warn('[NostrService] Failed to cache post:', err);
+      }
+    }
+
+    return post;
   }
 
   async fetchPostByNevent(nevent: string): Promise<BlogPost | null> {
@@ -319,6 +349,23 @@ export class NostrService {
       }
 
       const data = decoded.data as nip19.EventPointer;
+
+      // Check cache first for fast loading
+      if (this.cacheService && this.cacheConfig.enabled) {
+        try {
+          const cachedPost = await this.cacheService.getPostById(data.id);
+          if (cachedPost) {
+            // Load profile from cache or memory
+            const profiles = await this.cacheService.getProfiles([cachedPost.pubkey]);
+            profiles.forEach((profile, pk) => this.profileCache.set(pk, profile));
+            const enriched = this.enrichPostsWithProfiles([cachedPost]);
+            console.log('[NostrService] Returning nevent post from cache:', data.id);
+            return enriched[0] || null;
+          }
+        } catch (err) {
+          console.warn('[NostrService] Cache lookup failed for nevent:', err);
+        }
+      }
 
       // Use the relays from nevent if provided, otherwise use configured relays
       const relaysToUse = data.relays && data.relays.length > 0
@@ -343,7 +390,19 @@ export class NostrService {
       }
 
       const parsed = this.parsePosts(events);
-      return parsed[0] || null;
+      const post = parsed[0] || null;
+
+      // Save to cache for next time
+      if (post && this.cacheService && this.cacheConfig.enabled) {
+        try {
+          await this.cacheService.savePosts([post]);
+          await this.cacheService.saveProfiles(this.profileCache);
+        } catch (err) {
+          console.warn('[NostrService] Failed to cache nevent post:', err);
+        }
+      }
+
+      return post;
     } catch (err) {
       console.error('Failed to decode nevent:', err);
       return null;
@@ -360,6 +419,23 @@ export class NostrService {
       }
 
       const data = decoded.data as nip19.AddressPointer;
+
+      // Check cache first for fast loading
+      if (this.cacheService && this.cacheConfig.enabled) {
+        try {
+          const cachedPost = await this.cacheService.getPostByNaddr(data.pubkey, data.identifier);
+          if (cachedPost) {
+            // Load profile from cache or memory
+            const profiles = await this.cacheService.getProfiles([cachedPost.pubkey]);
+            profiles.forEach((profile, pk) => this.profileCache.set(pk, profile));
+            const enriched = this.enrichPostsWithProfiles([cachedPost]);
+            console.log('[NostrService] Returning naddr post from cache:', data.identifier);
+            return enriched[0] || null;
+          }
+        } catch (err) {
+          console.warn('[NostrService] Cache lookup failed for naddr:', err);
+        }
+      }
 
       // Use the relays from naddr if provided, otherwise use configured relays
       const relaysToUse = data.relays && data.relays.length > 0
@@ -387,6 +463,17 @@ export class NostrService {
       }
 
       const parsed = this.parsePost(latestEvent);
+
+      // Save to cache for next time
+      if (parsed && this.cacheService && this.cacheConfig.enabled) {
+        try {
+          await this.cacheService.savePosts([parsed]);
+          await this.cacheService.saveProfiles(this.profileCache);
+        } catch (err) {
+          console.warn('[NostrService] Failed to cache naddr post:', err);
+        }
+      }
+
       return parsed;
     } catch (err) {
       console.error('Failed to decode naddr:', err);
